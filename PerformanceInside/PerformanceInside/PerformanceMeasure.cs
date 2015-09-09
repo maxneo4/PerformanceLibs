@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
 using Microsoft.VisualBasic.Devices;
+using System.Linq.Expressions;
 
 namespace PerformanceInside
 {
@@ -32,10 +29,15 @@ namespace PerformanceInside
             return new PerformanceMeasure();
         }
 
-        public void BeginMeasure()
+        public PerformanceCounter TakePerformanceCounter(Expression<Action> actionCallExp)
         {
+            MethodCallExpression methodCallExp = (MethodCallExpression)actionCallExp.Body;
+            Action action = actionCallExp.Compile();
             BeginMemoryMeasure();
             _stopWatch.Restart();
+            action.Invoke();            
+            _performanceCounter.Method = methodCallExp.Method;
+            return EndMeasure();
         }
 
         private void BeginMemoryMeasure()
@@ -46,14 +48,14 @@ namespace PerformanceInside
             _beforeMemory = Process.GetCurrentProcess().VirtualMemorySize64;
         }
 
-        public PerformanceCounter EndMeasure()
+        private PerformanceCounter EndMeasure()
         {
             _stopWatch.Stop();
             _afterMemory = Process.GetCurrentProcess().VirtualMemorySize64;
             _performanceCounter.Memory = (_afterMemory - _beforeMemory)/ 1048576d;
             _performanceCounter.TimeSpan = _stopWatch.Elapsed;
             _performanceCounter.AvailablePhysicalMemory = _computerInfo.AvailablePhysicalMemory/ 1048576d;
-            _performanceCounter.Method = new StackTrace(0).GetFrame(1).GetMethod();
+            //_performanceCounter.Method = new StackTrace(0).GetFrame(1).GetMethod();
             return _performanceCounter;
         }
     }

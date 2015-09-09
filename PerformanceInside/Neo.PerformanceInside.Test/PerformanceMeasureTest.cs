@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,12 +18,10 @@ namespace Neo.PerformanceInside.Test
         public void GenerateArrayFromBuildObjectTest()
         {
             //given
-            string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 3500);
+            string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 33500);
             PerformanceMeasure performanceMeasure = PerformanceMeasure.GetPerformanceMeasure();
             //when
-            performanceMeasure.BeginMeasure();
-            Process(inputs);
-            PerformanceCounter performanceCounter = performanceMeasure.EndMeasure();
+            PerformanceCounter performanceCounter = performanceMeasure.TakePerformanceCounter(()=> Process(inputs));            
             //then
             Assert.IsNotNull(performanceCounter);
         }
