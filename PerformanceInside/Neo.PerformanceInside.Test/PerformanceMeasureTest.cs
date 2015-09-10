@@ -35,9 +35,12 @@ namespace Neo.PerformanceInside.Test
             //given
             string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 3500);
             //when
+            PerformanceMeasure performanceMeasure = PerformanceMeasure.GetPerformanceMeasure();
+            performanceMeasure.StartMemoryMeasure();
             ProcessA(inputs);
+            performanceMeasure.StopMemoryMeasure();
             //then
-           
+            Assert.IsNotNull(performanceMeasure);
         }
 
         private static string _result;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
@@ -19,7 +20,8 @@ namespace PerformanceInside
         long _beforeMemory,
             _afterMemory;
         PerformanceCounter _performanceCounter;
-        static PerformanceMeasure _performanceMeasure;     
+        Dictionary<string, Action> _cacheExpressionMethod;
+        static PerformanceMeasure _performanceMeasure;            
 
         #endregion
 
@@ -32,7 +34,8 @@ namespace PerformanceInside
         private PerformanceMeasure()
         {
             _stopWatch = new Stopwatch();
-            _performanceCounter = new PerformanceCounter();            
+            _performanceCounter = new PerformanceCounter();
+            _cacheExpressionMethod = new Dictionary<string, Action>();      
         }
 
         public static PerformanceMeasure GetPerformanceMeasure()
@@ -43,10 +46,9 @@ namespace PerformanceInside
         public void TakePerformanceMeasure(Expression<Action> actionCallExp)
         {
             MethodCallExpression methodCallExp = (MethodCallExpression)actionCallExp.Body;
-            Action action = actionCallExp.Compile();
-           // StartMeasure();
-            Run(action);
-           // StopMeasure();
+            Action action = _cacheExpressionMethod.ContainsKey(methodCallExp.Method.Name)?
+            _cacheExpressionMethod[methodCallExp.Method.Name] : _cacheExpressionMethod[methodCallExp.Method.Name] = actionCallExp.Compile();            
+            Run(action);            
             _performanceCounter.Method = methodCallExp.Method;
             _performanceCounter.EnvironmentMethod = new StackTrace(1).GetFrame(1).GetMethod();
         }
@@ -59,7 +61,7 @@ namespace PerformanceInside
             _performanceCounter.TimeSpan = _stopWatch.Elapsed;
         }
 
-        private void StartMeasure()
+        public void StartMemoryMeasure()
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -68,7 +70,7 @@ namespace PerformanceInside
             
         }
 
-        private void StopMeasure()
+        public void StopMemoryMeasure()
         {  
             _afterMemory = Process.GetCurrentProcess().VirtualMemorySize64;
             _performanceCounter.Memory = (_afterMemory - _beforeMemory)/ BYTES_BY_MEGA; 
