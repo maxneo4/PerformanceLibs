@@ -1,12 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PerformanceInside;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Neo.PerformanceInside.Test
 {
@@ -15,15 +9,15 @@ namespace Neo.PerformanceInside.Test
     {
 
         [TestMethod]
-        public void GenerateArrayFromBuildObjectTest()
+        public void MeasureProcessStringArrayTest()
         {
             //given
-            string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 33500);
+            string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 3500);
             PerformanceMeasure performanceMeasure = PerformanceMeasure.GetPerformanceMeasure();
             //when
-            PerformanceCounter performanceCounter = performanceMeasure.TakePerformanceCounter(()=> Process(inputs));            
+            performanceMeasure.TakePerformanceMeasure(()=> Process(inputs));            
             //then
-            Assert.IsNotNull(performanceCounter);
+            Assert.IsNotNull(performanceMeasure.PerformanceCounter);
         }
 
         private static void Process(string[] inputs)
@@ -33,6 +27,34 @@ namespace Neo.PerformanceInside.Test
             {
                 result += inputs[i];
             }
+        }
+
+        [TestMethod]
+        public void MeasureEveryIterationInProcessStringTest()
+        {
+            //given
+            string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 3500);
+            //when
+            ProcessA(inputs);
+            //then
+           
+        }
+
+        private static string _result;
+
+        private static void ProcessA(string[] inputs)
+        {
+            PerformanceMeasure performanceMeasure = PerformanceMeasure.GetPerformanceMeasure();
+            string result = "";
+            for (int i = 0; i < inputs.Length; i++)
+            {
+                performanceMeasure.TakePerformanceMeasure(() => AddString(inputs, i));                
+            }
+        }
+
+        private static void AddString(string[] inputs, int i)
+        {
+            _result += inputs[i];           
         }
     }
 }
