@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PerformanceInside;
 using System.IO;
+using System;
 
 namespace Neo.PerformanceInside.Test
 {
@@ -8,6 +9,7 @@ namespace Neo.PerformanceInside.Test
     public  class PerformanceMeasureTest
     {
 
+        #region ArrayTest
         [TestMethod]
         public void MeasureProcessStringArrayTest()
         {
@@ -15,7 +17,7 @@ namespace Neo.PerformanceInside.Test
             string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 3500);
             PerformanceMeasure performanceMeasure = PerformanceMeasure.GetPerformanceMeasure();
             //when
-            performanceMeasure.TakePerformanceMeasure(()=> Process(inputs));            
+            performanceMeasure.TakePerformanceMeasure(typeof(PerformanceMeasureTest), () => Process(inputs));
             //then
             Assert.IsNotNull(performanceMeasure.PerformanceCounter);
         }
@@ -28,7 +30,9 @@ namespace Neo.PerformanceInside.Test
                 result += inputs[i];
             }
         }
+        #endregion
 
+        #region Every
         [TestMethod]
         public void MeasureEveryIterationInProcessStringTest()
         {
@@ -37,7 +41,7 @@ namespace Neo.PerformanceInside.Test
             //when
             PerformanceMeasure performanceMeasure = PerformanceMeasure.GetPerformanceMeasure();
             performanceMeasure.StartMemoryMeasure();
-            ProcessA(inputs);
+            ProcessInputs(inputs);
             performanceMeasure.StopMemoryMeasure();
             //then
             Assert.IsNotNull(performanceMeasure);
@@ -45,19 +49,72 @@ namespace Neo.PerformanceInside.Test
 
         private static string _result;
 
-        private static void ProcessA(string[] inputs)
+        private static void ProcessInputs(string[] inputs)
         {
             PerformanceMeasure performanceMeasure = PerformanceMeasure.GetPerformanceMeasure();
             string result = "";
             for (int i = 0; i < inputs.Length; i++)
             {
-                performanceMeasure.TakePerformanceMeasure(() => AddString(inputs, i));                
+                performanceMeasure.TakePerformanceMeasure(null, () => AddString(inputs, i));
             }
         }
 
         private static void AddString(string[] inputs, int i)
         {
-            _result += inputs[i];           
+            _result += inputs[i];
         }
+        #endregion
+
+        #region Interfaces implementation
+
+        [TestMethod]
+        public void MeasureICustomProcessTest()
+        {
+            //given            
+            PerformanceMeasure performanceMeasure = PerformanceMeasure.GetPerformanceMeasure();
+            //when
+            RunCustomProcess();
+            //then
+            Type cl = performanceMeasure.PerformanceCounter.Method.ReflectedType;
+            Assert.IsNotNull(performanceMeasure.PerformanceCounter);
+        }
+        private void RunCustomProcess()
+        {
+            PerformanceMeasure performanceMeasure = PerformanceMeasure.GetPerformanceMeasure();
+            IProcess[] process = new IProcess[] { new ProcessA(), new ProcessB() };
+            foreach (IProcess processitem in process)
+            {
+                performanceMeasure.TakePerformanceMeasure(processitem, ()=>processitem.Run());
+            }
+        }
+
+        interface IProcess
+        {
+            void Run();
+        }
+
+        class ProcessA : IProcess
+        {
+            public void Run()
+            {
+                for (int i = 0; i < 5000; i++)
+                {
+
+                }
+            }
+        }
+
+        class ProcessB : IProcess
+        {
+            public void Run()
+            {
+                for (int i = 0; i < 50000; i++)
+                {
+
+                }
+            }
+        }
+
+        #endregion
     }
 }

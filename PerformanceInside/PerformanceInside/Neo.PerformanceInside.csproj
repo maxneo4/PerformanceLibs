@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataGenerator.cs" />
+    <Compile Include="DictionaryMultipleKeys.cs" />
     <Compile Include="PerformanceCounter.cs" />
     <Compile Include="PerformanceMeasure.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace PerformanceInside
 {
@@ -20,7 +21,7 @@ namespace PerformanceInside
         long _beforeMemory,
             _afterMemory;
         PerformanceCounter _performanceCounter;
-        Dictionary<string, Action> _cacheExpressionMethod;
+        Dictionary<DictionaryMultipleKeys, Action> _cacheExpressionMethod;
         static PerformanceMeasure _performanceMeasure;            
 
         #endregion
@@ -28,6 +29,7 @@ namespace PerformanceInside
         #region Properties
 
         public PerformanceCounter PerformanceCounter { get { return _performanceCounter; } }
+        public double MemoryCounter { get; private set; }
 
         #endregion
 
@@ -35,7 +37,7 @@ namespace PerformanceInside
         {
             _stopWatch = new Stopwatch();
             _performanceCounter = new PerformanceCounter();
-            _cacheExpressionMethod = new Dictionary<string, Action>();      
+            _cacheExpressionMethod = new Dictionary<DictionaryMultipleKeys, Action>();      
         }
 
         public static PerformanceMeasure GetPerformanceMeasure()
@@ -43,14 +45,18 @@ namespace PerformanceInside
             return _performanceMeasure ?? (_performanceMeasure = new PerformanceMeasure());
         }
 
-        public void TakePerformanceMeasure(Expression<Action> actionCallExp)
-        {
+        public void TakePerformanceMeasure(object sourceObject, Expression < Action> actionCallExp)
+        {            
             MethodCallExpression methodCallExp = (MethodCallExpression)actionCallExp.Body;
-            Action action = _cacheExpressionMethod.ContainsKey(methodCallExp.Method.Name)?
-            _cacheExpressionMethod[methodCallExp.Method.Name] : _cacheExpressionMethod[methodCallExp.Method.Name] = actionCallExp.Compile();            
-            Run(action);            
+            DictionaryMultipleKeys key = new DictionaryMultipleKeys(sourceObject, methodCallExp.Method.Name);
+            Action action = _cacheExpressionMethod.ContainsKey(key)?
+            _cacheExpressionMethod[key] : _cacheExpressionMethod[key] = actionCallExp.Compile();            
+            Run(action);
+            PerformanceCounter.SourceType = sourceObject!=null? 
+                (sourceObject is Type? (Type)sourceObject : 
+                sourceObject.GetType()) : null;
             _performanceCounter.Method = methodCallExp.Method;
-            _performanceCounter.EnvironmentMethod = new StackTrace(1).GetFrame(1).GetMethod();
+            _performanceCounter.EnvironmentMethod = new StackTrace().GetFrame(1).GetMethod();           
         }
 
         private void Run(Action action)
@@ -73,7 +79,8 @@ namespace PerformanceInside
         public void StopMemoryMeasure()
         {  
             _afterMemory = Process.GetCurrentProcess().VirtualMemorySize64;
-            _performanceCounter.Memory = (_afterMemory - _beforeMemory)/ BYTES_BY_MEGA; 
+            MemoryCounter = (_afterMemory - _beforeMemory)/ BYTES_BY_MEGA; 
         }
+        
     }
 }
