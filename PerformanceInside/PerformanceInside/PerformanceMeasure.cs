@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
-using System.Reflection;
+using System.Text;
 
 namespace PerformanceInside
 {
@@ -12,6 +12,7 @@ namespace PerformanceInside
         #region Constants
 
         internal const double BYTES_BY_MEGA = 1048576d;
+        internal const string reportColumnHeaders = "SourceType\tEnvironmentMethod\tMethod\tSeconds\tMiliseconds\tIteration\tMemory\tCustomData";
 
         #endregion
 
@@ -22,7 +23,11 @@ namespace PerformanceInside
             _afterMemory;
         PerformanceCounter _performanceCounter;
         Dictionary<DictionaryMultipleKeys, Action> _cacheExpressionMethod;
-        static PerformanceMeasure _performanceMeasure;            
+        
+
+        static StringBuilder _headerData;
+        static StringBuilder _reportData;
+        static PerformanceMeasure _performanceMeasure;
 
         #endregion
 
@@ -33,19 +38,70 @@ namespace PerformanceInside
 
         #endregion
 
+        #region Constructor
+
         private PerformanceMeasure()
         {
             _stopWatch = new Stopwatch();
             _performanceCounter = new PerformanceCounter();
-            _cacheExpressionMethod = new Dictionary<DictionaryMultipleKeys, Action>();      
+            _cacheExpressionMethod = new Dictionary<DictionaryMultipleKeys, Action>();            
         }
 
-        public static PerformanceMeasure GetPerformanceMeasure()
+        static PerformanceMeasure()
+        {
+            _headerData = new StringBuilder();
+            _reportData = new StringBuilder();
+        }
+
+        #endregion
+
+        public static void CountTime(object sourceObject, Expression<Action> actionCallExp)
+        {
+            PerformanceMeasure performanceMeasure = GetPerformanceMeasure();
+            performanceMeasure.TakePerformanceMeasure(sourceObject, actionCallExp);
+        }        
+
+        public static void AddcustomData(string key, object value)
+        {
+            PerformanceMeasure performanceMeasure = GetPerformanceMeasure();
+            AddDataToStringBuilder(performanceMeasure.PerformanceCounter._customData, key, value);
+        }
+
+        public static void AddHeaderData(string key, object value)
+        {
+            AddDataToStringBuilder(_headerData, key, value);
+        }
+
+        public static string GetReport()
+        {
+            _reportData.AppendLine(_headerData.ToString());
+            _reportData.AppendLine(reportColumnHeaders);
+            AddPerformanceCounterToStrigBuilder(_reportData, GetPerformanceMeasure().PerformanceCounter);
+            return _reportData.ToString();
+        }
+
+        #region Private methods
+
+        private static void AddPerformanceCounterToStrigBuilder(StringBuilder stringBuilder, PerformanceCounter performanceCounter)
+        {
+            const string tab = "\t";
+            stringBuilder.Append(performanceCounter.SourceType).Append(tab).Append(performanceCounter.EnvironmentMethod).Append(tab).
+                Append(performanceCounter.Method).Append(tab).Append(performanceCounter.TimeSpan.Seconds).Append(tab).
+                Append(performanceCounter.TimeSpan.Milliseconds).Append(tab).Append(performanceCounter.Iteration).Append(tab).
+                Append(performanceCounter.Memory).Append(tab).Append(performanceCounter._customData).AppendLine();
+        }
+
+        private static void AddDataToStringBuilder(StringBuilder stringBuilder, string key, object value)
+        {
+            stringBuilder.Append("<").Append(key).Append(" : ").Append(value).Append("> ");
+        }
+
+        private static PerformanceMeasure GetPerformanceMeasure()
         {
             return _performanceMeasure ?? (_performanceMeasure = new PerformanceMeasure());
         }
 
-        public void TakePerformanceMeasure(object sourceObject, Expression < Action> actionCallExp)
+        private void TakePerformanceMeasure(object sourceObject, Expression < Action> actionCallExp)
         {            
             MethodCallExpression methodCallExp = (MethodCallExpression)actionCallExp.Body;
             DictionaryMultipleKeys key = new DictionaryMultipleKeys(sourceObject, methodCallExp.Method.Name);
@@ -56,7 +112,7 @@ namespace PerformanceInside
                 (sourceObject is Type? (Type)sourceObject : 
                 sourceObject.GetType()) : null;
             _performanceCounter.Method = methodCallExp.Method;
-            _performanceCounter.EnvironmentMethod = new StackTrace().GetFrame(1).GetMethod();           
+            _performanceCounter.EnvironmentMethod = new StackTrace(1).GetFrame(1).GetMethod();           
         }
 
         private void Run(Action action)
@@ -67,7 +123,7 @@ namespace PerformanceInside
             _performanceCounter.TimeSpan = _stopWatch.Elapsed;
         }
 
-        public void StartMemoryMeasure()
+        private void StartMemoryMeasure()
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -76,11 +132,12 @@ namespace PerformanceInside
             
         }
 
-        public void StopMemoryMeasure()
+        private void StopMemoryMeasure()
         {  
             _afterMemory = Process.GetCurrentProcess().VirtualMemorySize64;
             MemoryCounter = (_afterMemory - _beforeMemory)/ BYTES_BY_MEGA; 
         }
-        
+
+        #endregion
     }
 }

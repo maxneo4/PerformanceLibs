@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PerformanceInside;
 using System.IO;
-using System;
 
 namespace Neo.PerformanceInside.Test
 {
@@ -15,15 +14,22 @@ namespace Neo.PerformanceInside.Test
         {
             //given
             string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 3500);
-            PerformanceMeasure performanceMeasure = PerformanceMeasure.GetPerformanceMeasure();
             //when
-            performanceMeasure.TakePerformanceMeasure(typeof(PerformanceMeasureTest), () => Process(inputs));
+            PerformanceMeasure.AddHeaderData("base de datos", "Abengoa");
+            PerformanceMeasure.AddHeaderData("Version", "10.6");
+            PerformanceMeasure.AddHeaderData("Languages", 2500);
+            PerformanceMeasure.CountTime(typeof(PerformanceMeasureTest), () => Process(inputs));
             //then
-            Assert.IsNotNull(performanceMeasure.PerformanceCounter);
+            string performaceReport = PerformanceMeasure.GetReport();
+            Assert.IsNotNull(performaceReport);
+            Assert.IsTrue(performaceReport.Contains("<base de datos : Abengoa> <Version : 10.6> <Languages : 2500> "));
+            Assert.IsTrue(performaceReport.Contains("<length inputs : 3500> "));
+
         }
 
         private static void Process(string[] inputs)
         {
+            PerformanceMeasure.AddcustomData("length inputs", inputs.Length);
             string result = "";
             for (int i = 0; i < inputs.Length; i++)
             {
@@ -38,30 +44,30 @@ namespace Neo.PerformanceInside.Test
         {
             //given
             string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 3500);
-            //when
-            PerformanceMeasure performanceMeasure = PerformanceMeasure.GetPerformanceMeasure();
-            performanceMeasure.StartMemoryMeasure();
+            //when           
+            
             ProcessInputs(inputs);
-            performanceMeasure.StopMemoryMeasure();
+
             //then
-            Assert.IsNotNull(performanceMeasure);
+            string performaceReport = PerformanceMeasure.GetReport();
+            Assert.IsNotNull(performaceReport);
         }
 
         private static string _result;
 
         private static void ProcessInputs(string[] inputs)
-        {
-            PerformanceMeasure performanceMeasure = PerformanceMeasure.GetPerformanceMeasure();
+        {            
             string result = "";
             for (int i = 0; i < inputs.Length; i++)
             {
-                performanceMeasure.TakePerformanceMeasure(null, () => AddString(inputs, i));
+                PerformanceMeasure.CountTime(null, () => AddString(inputs, i));
             }
         }
 
-        private static void AddString(string[] inputs, int i)
+        private static string AddString(string[] inputs, int i)
         {
             _result += inputs[i];
+            return _result;
         }
         #endregion
 
@@ -71,20 +77,19 @@ namespace Neo.PerformanceInside.Test
         public void MeasureICustomProcessTest()
         {
             //given            
-            PerformanceMeasure performanceMeasure = PerformanceMeasure.GetPerformanceMeasure();
+            
             //when
             RunCustomProcess();
             //then
-            Type cl = performanceMeasure.PerformanceCounter.Method.ReflectedType;
-            Assert.IsNotNull(performanceMeasure.PerformanceCounter);
+
+            Assert.IsNotNull(PerformanceMeasure.GetReport());
         }
         private void RunCustomProcess()
-        {
-            PerformanceMeasure performanceMeasure = PerformanceMeasure.GetPerformanceMeasure();
+        {            
             IProcess[] process = new IProcess[] { new ProcessA(), new ProcessB() };
             foreach (IProcess processitem in process)
             {
-                performanceMeasure.TakePerformanceMeasure(processitem, ()=>processitem.Run());
+                PerformanceMeasure.CountTime(processitem, ()=>processitem.Run());
             }
         }
 
