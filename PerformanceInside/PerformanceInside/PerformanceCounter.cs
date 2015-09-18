@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
@@ -18,6 +19,15 @@ namespace PerformanceInside
         public PerformanceCounter()
         {
             _customData = new StringBuilder();
+        }
+
+        internal void FillData(object sourceObject, MethodBase method)
+        {
+            SourceType = sourceObject != null ?
+                (sourceObject is Type ? (Type)sourceObject :
+                sourceObject.GetType()) : null;
+            Method = method;
+            EnvironmentMethod = new StackTrace(2).GetFrame(1).GetMethod();
         }
     }
 }

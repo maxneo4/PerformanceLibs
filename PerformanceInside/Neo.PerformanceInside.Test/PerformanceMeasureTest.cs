@@ -15,21 +15,22 @@ namespace Neo.PerformanceInside.Test
             //given
             string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 3500);
             //when
-            PerformanceMeasure.AddHeaderData("base de datos", "Abengoa");
-            PerformanceMeasure.AddHeaderData("Version", "10.6");
-            PerformanceMeasure.AddHeaderData("Languages", 2500);
+            PerformanceReport.AddHeaderData("base de datos", "Abengoa");
+            PerformanceReport.AddHeaderData("Version", "10.6");
+            PerformanceReport.AddHeaderData("Languages", 2500);
             PerformanceMeasure.CountTime(typeof(PerformanceMeasureTest), () => Process(inputs));
+            string performaceReport = PerformanceReport.GetReport();
             //then
-            string performaceReport = PerformanceMeasure.GetReport();
             Assert.IsNotNull(performaceReport);
             Assert.IsTrue(performaceReport.Contains("<base de datos : Abengoa> <Version : 10.6> <Languages : 2500> "));
             Assert.IsTrue(performaceReport.Contains("<length inputs : 3500> "));
-
+            Assert.IsTrue(performaceReport.Contains("Void Process(System.String[])"));
+            Assert.IsTrue(performaceReport.Contains("Void MeasureProcessStringArrayTest()"));
         }
 
-        private static void Process(string[] inputs)
+        private void Process(string[] inputs)
         {
-            PerformanceMeasure.AddcustomData("length inputs", inputs.Length);
+            PerformanceReport.AddCustomData("length inputs", inputs.Length);
             string result = "";
             for (int i = 0; i < inputs.Length; i++)
             {
@@ -37,6 +38,40 @@ namespace Neo.PerformanceInside.Test
             }
         }
         #endregion
+
+        #region ArrayFunctionTest
+        [TestMethod]
+        public void MeasureProcessStringArrayFunctionTest()
+        {
+            //given
+            string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 3500);
+            string result = null;
+            //when
+            PerformanceReport.AddHeaderData("base de datos", "Abengoa");
+            PerformanceReport.AddHeaderData("Version", "10.6");
+            PerformanceReport.AddHeaderData("Languages", 2500);
+            PerformanceMeasure.CountTime(typeof(PerformanceMeasureTest), () => result = Acumulate(inputs));
+            string performaceReport = PerformanceReport.GetReport();
+            //then
+            Assert.IsNotNull(performaceReport);
+            Assert.IsTrue(performaceReport.Contains("<base de datos : Abengoa> <Version : 10.6> <Languages : 2500> "));
+            Assert.IsTrue(performaceReport.Contains("<length inputs : 3500> "));
+            Assert.IsTrue(performaceReport.Contains("Void Acumulate(System.String[])"));
+            Assert.IsTrue(performaceReport.Contains("Void MeasureProcessStringArrayFunctionTest()"));
+        }
+
+        private static string Acumulate(string[] inputs)
+        {
+            PerformanceReport.AddCustomData("length inputs", inputs.Length);
+            string result = "";
+            for (int i = 0; i < inputs.Length; i++)
+            {
+                result += inputs[i];
+            }
+            return result;
+        }
+        #endregion
+
 
         #region Every
         [TestMethod]
@@ -49,7 +84,7 @@ namespace Neo.PerformanceInside.Test
             ProcessInputs(inputs);
 
             //then
-            string performaceReport = PerformanceMeasure.GetReport();
+            string performaceReport = PerformanceReport.GetReport();
             Assert.IsNotNull(performaceReport);
         }
 
@@ -82,7 +117,7 @@ namespace Neo.PerformanceInside.Test
             RunCustomProcess();
             //then
 
-            Assert.IsNotNull(PerformanceMeasure.GetReport());
+            Assert.IsNotNull(PerformanceReport.GetReport());
         }
         private void RunCustomProcess()
         {            
