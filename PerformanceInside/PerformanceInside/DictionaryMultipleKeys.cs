@@ -14,7 +14,7 @@ namespace PerformanceInside
         public DictionaryMultipleKeys(params object[] objects)
         {
             _objects = objects;
-            _objectsRepresentation = String.Join("#", objects);
+            _objectsRepresentation = string.Join("#", objects);
         }
 
         public object[] GetObjects

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Reflection;
 using System.Text;
 
 namespace PerformanceInside
@@ -9,9 +8,8 @@ namespace PerformanceInside
     {
         internal StringBuilder _customData;
 
-        public TimeSpan TimeSpan { get; internal set; }        
-        public MethodBase Method { get; internal set; }
-        public MethodBase EnvironmentMethod { get; internal set; }
+        public TimeSpan TimeSpan { get; internal set; }  
+        public string EnvironmentMethod { get; internal set; }
         public Type SourceType { get; internal set; }
         public double Memory { get; internal set; }
         public int Iteration { get; internal set; }
@@ -21,13 +19,12 @@ namespace PerformanceInside
             _customData = new StringBuilder();
         }
 
-        internal void FillData(object sourceObject, MethodBase method)
+        internal void FillData(object sourceObject)
         {
             SourceType = sourceObject != null ?
                 (sourceObject is Type ? (Type)sourceObject :
-                sourceObject.GetType()) : null;
-            Method = method;
-            EnvironmentMethod = new StackTrace(2).GetFrame(1).GetMethod();
+                sourceObject.GetType()) : null;                                  
+            EnvironmentMethod = new StackTrace(2).GetFrame(1).GetMethod().ToString();
         }
     }
 }
