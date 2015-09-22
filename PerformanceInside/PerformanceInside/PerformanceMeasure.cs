@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace PerformanceInside
 {
@@ -11,7 +13,7 @@ namespace PerformanceInside
         Stopwatch _stopWatch;
         StopMemory _stopMemory;
         internal PerformanceCounter _currentPerformanceCounter;
-        
+                
         #endregion
                 
         static PerformanceMeasure _performanceMeasure;
@@ -31,24 +33,24 @@ namespace PerformanceInside
 
         #endregion
 
-        public static void CountTime(object sourceObject, Action actionCallExp)
-        {
+        public static void CountTime(object sourceObject, Action actionCallExp, [CallerMemberName]string caller = "None")
+        {            
             PerformanceMeasure performanceMeasure = GetPerformanceMeasure();
-            performanceMeasure.TakePerformanceMeasure(sourceObject, actionCallExp);
+            performanceMeasure.TakePerformanceMeasure(sourceObject, actionCallExp, caller);
         }
 
-        public static void CountTime(object sourceObject, Func<object> actionCallExp)
+        public static void CountTime(object sourceObject, Func<object> actionCallExp, [CallerMemberName]string caller = "None")
         {
             PerformanceMeasure performanceMeasure = GetPerformanceMeasure();
-            performanceMeasure.TakePerformanceMeasure(sourceObject, actionCallExp);
+            performanceMeasure.TakePerformanceMeasure(sourceObject, actionCallExp, caller);
         }
 
         #region Private methods
 
-        private void TakePerformanceMeasure(object sourceObject, Delegate func)
+        private void TakePerformanceMeasure(object sourceObject, Delegate func, string caller)
         {
             Run(func);
-            _currentPerformanceCounter.FillData(sourceObject);
+            _currentPerformanceCounter.FillData(sourceObject, caller);
         }                      
 
         private void Run(Delegate func)

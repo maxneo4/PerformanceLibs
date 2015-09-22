@@ -19,12 +19,12 @@ namespace PerformanceInside
             _customData = new StringBuilder();
         }
 
-        internal void FillData(object sourceObject)
+        internal void FillData(object sourceObject, string caller)
         {
             SourceType = sourceObject != null ?
                 (sourceObject is Type ? (Type)sourceObject :
                 sourceObject.GetType()) : null;                                  
-            EnvironmentMethod = new StackTrace(2).GetFrame(1).GetMethod().ToString();
+            EnvironmentMethod = caller;
         }
     }
 }

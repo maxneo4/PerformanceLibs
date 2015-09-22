@@ -24,7 +24,7 @@ namespace Neo.PerformanceInside.Test
             Assert.IsNotNull(performaceReport);
             Assert.IsTrue(performaceReport.Contains("<base de datos : Abengoa> <Version : 10.6> <Languages : 2500> "));
             Assert.IsTrue(performaceReport.Contains("<length inputs : 3500> "));            
-            Assert.IsTrue(performaceReport.Contains("Void MeasureProcessStringArrayTest()"));
+            Assert.IsTrue(performaceReport.Contains("MeasureProcessStringArrayTest"));
         }       
 
         private void Process(string[] inputs)
@@ -55,7 +55,7 @@ namespace Neo.PerformanceInside.Test
             Assert.IsNotNull(performaceReport);
             Assert.IsTrue(performaceReport.Contains("<base de datos : Abengoa> <Version : 10.6> <Languages : 2500> "));
             Assert.IsTrue(performaceReport.Contains("<length inputs : 3500> "));            
-            Assert.IsTrue(performaceReport.Contains("Void MeasureProcessStringArrayFunctionTest()"));
+            Assert.IsTrue(performaceReport.Contains("MeasureProcessStringArrayFunctionTest"));
         }
 
         private static string Acumulate(string[] inputs)
@@ -83,7 +83,7 @@ namespace Neo.PerformanceInside.Test
 
             //then
             string performaceReport = PerformanceReport.GetReport();
-            Assert.IsNotNull(performaceReport);
+            Assert.IsTrue(performaceReport.Split('\n').Length > 3500);
         }
 
         private static string _result;
