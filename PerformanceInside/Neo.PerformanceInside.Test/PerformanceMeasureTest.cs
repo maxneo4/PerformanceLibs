@@ -7,6 +7,13 @@ namespace Neo.PerformanceInside.Test
     [TestClass]
     public  class PerformanceMeasureTest
     {
+        
+        [TestCleanup]
+        public void Initialize()
+        {
+            PerformanceMeasure.Reset();
+            PerformanceReport.Clear();
+        }
 
         #region ArrayTest
         [TestMethod]
@@ -76,24 +83,52 @@ namespace Neo.PerformanceInside.Test
         public void MeasureEveryIterationInProcessStringTest()
         {
             //given
-            string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 3500);
+            string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 6);
             //when           
             
-            ProcessInputs(inputs);
+            ProcessInputs(inputs, 2);
 
             //then
             string performaceReport = PerformanceReport.GetReport();
-            Assert.IsTrue(performaceReport.Split('\n').Length > 3500);
+            Assert.IsTrue(performaceReport.Split('\n').Length == 3 + 3);
+        }
+
+        [TestMethod]
+        public void MeasureEveryIterationInProcessStringResidueTest()
+        {
+            //given
+            string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 11);
+            //when           
+
+            ProcessInputs(inputs, 3);
+
+            //then
+            string performaceReport = PerformanceReport.GetReport();
+            Assert.IsTrue(performaceReport.Split('\n').Length == 4 + 3);
+        }
+
+        [TestMethod]
+        public void MeasureEveryIterationInProcessStringAcumulativeTest()
+        {
+            //given
+            string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 5000);
+            //when           
+
+            ProcessInputs(inputs, 100);//100
+
+            //then
+            string performaceReport = PerformanceReport.GetReport();
+            Assert.IsTrue(performaceReport.Split('\n').Length == 50 + 3);
         }
 
         private static string _result;
 
-        private static void ProcessInputs(string[] inputs)
+        private static void ProcessInputs(string[] inputs, int every)
         {            
             string result = "";
             for (int i = 0; i < inputs.Length; i++)
             {
-                PerformanceMeasure.CountTime(null, () => AddString(inputs, i));
+                PerformanceMeasure.CountTime(typeof(PerformanceMeasureTest), () => AddString(inputs, i), every);
             }
         }
 

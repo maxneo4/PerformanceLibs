@@ -42,8 +42,15 @@ namespace PerformanceInside
         {
             _reportData.AppendLine(_headerData.ToString());
             _reportData.AppendLine(reportColumnHeaders);
-            PerformanceReportWritter.AddPerformanceCounterToStrigBuilder(_reportData, PerformanceMeasure.GetPerformanceMeasure()._currentPerformanceCounter);
+            foreach (PerformanceCounter performanceCounter in PerformanceMeasure.GetPerformanceMeasure()._perfomanceCounters)
+                PerformanceReportWritter.AddPerformanceCounterToStrigBuilder(_reportData, performanceCounter);
             return _reportData.ToString();
-        }        
+        }     
+        
+        public static void Clear()
+        {
+            _headerData.Clear();
+            _reportData.Clear();
+        }   
     }
 }

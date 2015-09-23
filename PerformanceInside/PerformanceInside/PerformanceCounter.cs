@@ -14,9 +14,11 @@ namespace PerformanceInside
         public double Memory { get; internal set; }
         public int Iteration { get; internal set; }
 
-        public PerformanceCounter()
+        public PerformanceCounter(int iterationInitial)
         {
+            Iteration = iterationInitial;
             _customData = new StringBuilder();
+            TimeSpan = new TimeSpan();            
         }
 
         internal void FillData(object sourceObject, string caller)
@@ -25,6 +27,7 @@ namespace PerformanceInside
                 (sourceObject is Type ? (Type)sourceObject :
                 sourceObject.GetType()) : null;                                  
             EnvironmentMethod = caller;
+            Iteration++;
         }
     }
 }
