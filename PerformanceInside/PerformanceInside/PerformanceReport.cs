@@ -3,13 +3,7 @@
 namespace PerformanceInside
 {
     public class PerformanceReport
-    {
-        #region Constants
-
-        internal const string reportColumnHeaders = "SourceType\tEnvironmentMethod\tSeconds\tMiliseconds\tIteration\tMemory\tCustomData";
-
-        #endregion
-
+    {       
         #region Fields
 
         internal static StringBuilder _headerData;
@@ -41,7 +35,7 @@ namespace PerformanceInside
         public static string GetReport()
         {
             _reportData.AppendLine(_headerData.ToString());
-            _reportData.AppendLine(reportColumnHeaders);
+            _reportData.AppendLine(PerformanceReportWritter.reportColumnHeaders);
             foreach (PerformanceCounter performanceCounter in PerformanceMeasure.GetPerformanceMeasure()._perfomanceCounters)
                 PerformanceReportWritter.AddPerformanceCounterToStrigBuilder(_reportData, performanceCounter);
             return _reportData.ToString();
