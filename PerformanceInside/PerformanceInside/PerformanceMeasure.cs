@@ -17,13 +17,20 @@ namespace PerformanceInside
                 
         #endregion
                 
-        static PerformanceMeasure _performanceMeasure;
-        internal static PerformanceMeasure GetPerformanceMeasure()
+        internal static Dictionary<Delegate, PerformanceMeasure> _performanceMeasureByDelegate;
+        internal static PerformanceMeasure _currentPerformanceMeasure;
+        internal static PerformanceMeasure GetPerformanceMeasure(Delegate func)
         {
-            return _performanceMeasure ?? (_performanceMeasure = new PerformanceMeasure());
-        }
+            _currentPerformanceMeasure = _performanceMeasureByDelegate.ContainsKey(func) ? _performanceMeasureByDelegate[func] : (_performanceMeasureByDelegate[func] = new PerformanceMeasure());
+            return _currentPerformanceMeasure;
+       }
 
         #region Constructor
+
+        static PerformanceMeasure()
+        {
+            _performanceMeasureByDelegate = new Dictionary<Delegate, PerformanceMeasure>();
+        }
 
         private PerformanceMeasure()
         {
@@ -34,29 +41,42 @@ namespace PerformanceInside
 
         #endregion
 
-        public static void CountTime(object sourceObject, Action actionCallExp, int iterationPack = 1, [CallerMemberName]string caller = "None")
+        public static void CountTime(object sourceObject, Action action, int iterationPack = 1, [CallerMemberName]string caller = "None")
         {            
-            PerformanceMeasure performanceMeasure = GetPerformanceMeasure();
-            performanceMeasure.TakePerformanceMeasure(sourceObject, actionCallExp, iterationPack, caller);
+            PerformanceMeasure performanceMeasure = GetPerformanceMeasure(action);
+            performanceMeasure.TakePerformanceMeasure(sourceObject, action, iterationPack, caller);
         }
 
-        public static void CountTime(object sourceObject, Func<object> actionCallExp, int iterationPack = 1, [CallerMemberName]string caller = "None")
+        public static void CountTime(object sourceObject, Func<object> func, int iterationPack = 1, [CallerMemberName]string caller = "None")
         {
-            PerformanceMeasure performanceMeasure = GetPerformanceMeasure();
-            performanceMeasure.TakePerformanceMeasure(sourceObject, actionCallExp, iterationPack, caller);
+            PerformanceMeasure performanceMeasure = GetPerformanceMeasure(func);
+            performanceMeasure.TakePerformanceMeasure(sourceObject, func, iterationPack, caller);
+        }
+
+        public static void CountTimeAndMemory(object sourceObject, Action action, int iterationPack = 1, [CallerMemberName]string caller = "None")
+        {
+            PerformanceMeasure performanceMeasure = GetPerformanceMeasure(action);
+            performanceMeasure.TakePerformanceMeasure(sourceObject, action, iterationPack, caller, true);
+        }
+
+        public static void CountTimeAndMemory(object sourceObject, Func<object> func, int iterationPack = 1, [CallerMemberName]string caller = "None")
+        {
+            PerformanceMeasure performanceMeasure = GetPerformanceMeasure(func);
+            performanceMeasure.TakePerformanceMeasure(sourceObject, func, iterationPack, caller, true);
         }
 
         public static void Reset()
         {
-            _performanceMeasure = null;
+            _performanceMeasureByDelegate = new Dictionary<Delegate, PerformanceMeasure>();
         }
 
         #region Private methods
 
-        private void TakePerformanceMeasure(object sourceObject, Delegate func, int iterationPack, string caller)
+        private void TakePerformanceMeasure(object sourceObject, Delegate func, int iterationPack, string caller, bool measureMemory = false)
         {
             IteratePerformanceCounter(iterationPack);
-            Run(func);
+            if (measureMemory) RunAndTakeMemory( ()=>Run(func) );
+            else Run(func);
             _currentPerformanceCounter.FillData(sourceObject, caller);
         }
 
@@ -72,12 +92,20 @@ namespace PerformanceInside
         }
 
         private void Run(Delegate func)
-        {
+        {            
             _stopWatch.Restart();
             func.DynamicInvoke();
-            _stopWatch.Stop();
+            _stopWatch.Stop();            
             _currentPerformanceCounter.TimeSpan += _stopWatch.Elapsed;
         }    
+
+        private void RunAndTakeMemory(Action action)
+        {
+            _stopMemory.Restart();
+            action.Invoke();
+            _stopMemory.Stop();
+            _currentPerformanceCounter.Memory = _stopMemory.Memory;
+        }
 
         #endregion
     }

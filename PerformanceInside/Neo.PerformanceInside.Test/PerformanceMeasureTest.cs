@@ -56,7 +56,7 @@ namespace Neo.PerformanceInside.Test
             PerformanceReport.AddHeaderData("base de datos", "Abengoa");
             PerformanceReport.AddHeaderData("Version", "10.6");
             PerformanceReport.AddHeaderData("Languages", 2500);
-            PerformanceMeasure.CountTime(typeof(PerformanceMeasureTest), () => result = Acumulate(inputs));
+            PerformanceMeasure.CountTimeAndMemory(typeof(PerformanceMeasureTest), () => result = Acumulate(inputs));
             string performaceReport = PerformanceReport.GetReport();
             //then
             Assert.IsNotNull(performaceReport);
@@ -114,7 +114,7 @@ namespace Neo.PerformanceInside.Test
             string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 5000);
             //when           
 
-            ProcessInputs(inputs, 100);//100
+            PerformanceMeasure.CountTimeAndMemory(this, () => ProcessInputs(inputs, 100));//100
 
             //then
             string performaceReport = PerformanceReport.GetReport();
@@ -128,13 +128,16 @@ namespace Neo.PerformanceInside.Test
             string result = "";
             for (int i = 0; i < inputs.Length; i++)
             {
+                AddString(inputs, i);
                 PerformanceMeasure.CountTime(typeof(PerformanceMeasureTest), () => AddString(inputs, i), every);
             }
         }
 
         private static string AddString(string[] inputs, int i)
         {
-            _result += inputs[i];
+            inputs[i] = inputs[i].Replace("1", "A");
+            inputs[i] = inputs[i] + "ABC" + i + i.ToString() + "hi";
+            _result += inputs[i];            
             return _result;
         }
         #endregion

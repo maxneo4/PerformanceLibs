@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace PerformanceInside
 {
@@ -28,7 +30,7 @@ namespace PerformanceInside
 
         public static void AddCustomData(string key, object value)
         {
-            PerformanceMeasure performanceMeasure = PerformanceMeasure.GetPerformanceMeasure();
+            PerformanceMeasure performanceMeasure = PerformanceMeasure._currentPerformanceMeasure;
             PerformanceReportWritter.AddDataToStringBuilder(performanceMeasure._currentPerformanceCounter._customData, key, value);
         }
 
@@ -36,8 +38,9 @@ namespace PerformanceInside
         {
             _reportData.AppendLine(_headerData.ToString());
             _reportData.AppendLine(PerformanceReportWritter.reportColumnHeaders);
-            foreach (PerformanceCounter performanceCounter in PerformanceMeasure.GetPerformanceMeasure()._perfomanceCounters)
-                PerformanceReportWritter.AddPerformanceCounterToStrigBuilder(_reportData, performanceCounter);
+            foreach (KeyValuePair<Delegate, PerformanceMeasure> performanceMeasure in PerformanceMeasure._performanceMeasureByDelegate)            
+                foreach (PerformanceCounter performanceCounter in performanceMeasure.Value._perfomanceCounters)
+                    PerformanceReportWritter.AddPerformanceCounterToStrigBuilder(_reportData, performanceCounter);
             return _reportData.ToString();
         }     
         
