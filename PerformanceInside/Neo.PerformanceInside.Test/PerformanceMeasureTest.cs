@@ -118,7 +118,7 @@ namespace Neo.PerformanceInside.Test
 
             //then
             string performaceReport = PerformanceReport.GetReport();
-            Assert.IsTrue(performaceReport.Split('\n').Length == 50 + 3);
+            Assert.IsTrue(performaceReport.Split('\n').Length == 50 + 1 +3);
         }
 
         private static string _result;

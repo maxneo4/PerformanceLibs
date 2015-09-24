@@ -104,7 +104,7 @@ namespace PerformanceInside
             _stopMemory.Restart();
             action.Invoke();
             _stopMemory.Stop();
-            _currentPerformanceCounter.Memory = _stopMemory.Memory;
+            _currentPerformanceCounter.Memory += _stopMemory.Memory;
         }
 
         #endregion
