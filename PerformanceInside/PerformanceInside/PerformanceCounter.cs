@@ -3,7 +3,7 @@ using System.Text;
 
 namespace PerformanceInside
 {
-    public class PerformanceCounter
+    internal class PerformanceCounter
     {
         internal StringBuilder _customData;
 

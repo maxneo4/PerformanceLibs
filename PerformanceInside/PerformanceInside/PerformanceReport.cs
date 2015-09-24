@@ -30,6 +30,7 @@ namespace PerformanceInside
 
         public static void AddCustomData(string key, object value)
         {
+            if (PerformanceMeasure._currentPerformanceMeasure == null) return;
             PerformanceMeasure performanceMeasure = PerformanceMeasure._currentPerformanceMeasure;
             PerformanceReportWritter.AddDataToStringBuilder(performanceMeasure._currentPerformanceCounter._customData, key, value);
         }

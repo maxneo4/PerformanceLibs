@@ -11,6 +11,7 @@ namespace Neo.PerformanceInside.Test
         [TestCleanup]
         public void Initialize()
         {
+            PerformanceMeasure.Enabled = true;
             PerformanceMeasure.Reset();
             PerformanceReport.Clear();
         }
@@ -53,6 +54,8 @@ namespace Neo.PerformanceInside.Test
             string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 3500);
             string result = null;
             //when
+            PerformanceMeasure.Enabled = false;
+
             PerformanceReport.AddHeaderData("base de datos", "Abengoa");
             PerformanceReport.AddHeaderData("Version", "10.6");
             PerformanceReport.AddHeaderData("Languages", 2500);
@@ -61,8 +64,8 @@ namespace Neo.PerformanceInside.Test
             //then
             Assert.IsNotNull(performaceReport);
             Assert.IsTrue(performaceReport.Contains("<base de datos : Abengoa> <Version : 10.6> <Languages : 2500> "));
-            Assert.IsTrue(performaceReport.Contains("<length inputs : 3500> "));            
-            Assert.IsTrue(performaceReport.Contains("MeasureProcessStringArrayFunctionTest"));
+            Assert.IsFalse(performaceReport.Contains("<length inputs : 3500> "));            
+            Assert.IsFalse(performaceReport.Contains("MeasureProcessStringArrayFunctionTest"));
         }
 
         private static string Acumulate(string[] inputs)

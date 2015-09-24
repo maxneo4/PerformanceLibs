@@ -20,7 +20,7 @@ namespace PerformanceInside
         internal static Dictionary<Delegate, PerformanceMeasure> _performanceMeasureByDelegate;
         internal static PerformanceMeasure _currentPerformanceMeasure;
         internal static PerformanceMeasure GetPerformanceMeasure(Delegate func)
-        {
+        {            
             _currentPerformanceMeasure = _performanceMeasureByDelegate.ContainsKey(func) ? _performanceMeasureByDelegate[func] : (_performanceMeasureByDelegate[func] = new PerformanceMeasure());
             return _currentPerformanceMeasure;
        }
@@ -29,6 +29,7 @@ namespace PerformanceInside
 
         static PerformanceMeasure()
         {
+            Enabled = true;
             _performanceMeasureByDelegate = new Dictionary<Delegate, PerformanceMeasure>();
         }
 
@@ -37,32 +38,50 @@ namespace PerformanceInside
             _stopWatch = new Stopwatch();
             _stopMemory = new StopMemory();            
             _perfomanceCounters = new List<PerformanceCounter>();                           
-        }       
+        }
 
         #endregion
 
+        public static bool Enabled { get; set; }
+
         public static void CountTime(object sourceObject, Action action, int iterationPack = 1, [CallerMemberName]string caller = "None")
-        {            
-            PerformanceMeasure performanceMeasure = GetPerformanceMeasure(action);
-            performanceMeasure.TakePerformanceMeasure(sourceObject, action, iterationPack, caller);
+        {
+            if (Enabled)
+            {
+                PerformanceMeasure performanceMeasure = GetPerformanceMeasure(action);
+                performanceMeasure.TakePerformanceMeasure(sourceObject, action, iterationPack, caller);
+            }
+            else action();
         }
 
         public static void CountTime(object sourceObject, Func<object> func, int iterationPack = 1, [CallerMemberName]string caller = "None")
         {
-            PerformanceMeasure performanceMeasure = GetPerformanceMeasure(func);
-            performanceMeasure.TakePerformanceMeasure(sourceObject, func, iterationPack, caller);
+            if (Enabled)
+            {
+                PerformanceMeasure performanceMeasure = GetPerformanceMeasure(func);
+                performanceMeasure.TakePerformanceMeasure(sourceObject, func, iterationPack, caller);
+            }
+            else func();
         }
 
         public static void CountTimeAndMemory(object sourceObject, Action action, int iterationPack = 1, [CallerMemberName]string caller = "None")
         {
-            PerformanceMeasure performanceMeasure = GetPerformanceMeasure(action);
-            performanceMeasure.TakePerformanceMeasure(sourceObject, action, iterationPack, caller, true);
+            if (Enabled)
+            {
+                PerformanceMeasure performanceMeasure = GetPerformanceMeasure(action);
+                performanceMeasure.TakePerformanceMeasure(sourceObject, action, iterationPack, caller, true);
+            }
+            else action();
         }
 
         public static void CountTimeAndMemory(object sourceObject, Func<object> func, int iterationPack = 1, [CallerMemberName]string caller = "None")
         {
-            PerformanceMeasure performanceMeasure = GetPerformanceMeasure(func);
-            performanceMeasure.TakePerformanceMeasure(sourceObject, func, iterationPack, caller, true);
+            if (Enabled)
+            {
+                PerformanceMeasure performanceMeasure = GetPerformanceMeasure(func);
+                performanceMeasure.TakePerformanceMeasure(sourceObject, func, iterationPack, caller, true);
+            }
+            else func();
         }
 
         public static void Reset()
@@ -102,7 +121,7 @@ namespace PerformanceInside
         private void RunAndTakeMemory(Action action)
         {
             _stopMemory.Restart();
-            action.Invoke();
+            action();
             _stopMemory.Stop();
             _currentPerformanceCounter.Memory += _stopMemory.Memory;
         }
