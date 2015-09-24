@@ -9,7 +9,7 @@ namespace PerformanceInside
 
         public TimeSpan TimeSpan { get; internal set; }  
         public string EnvironmentMethod { get; internal set; }
-        public Type SourceType { get; internal set; }
+        public string SourceType { get; internal set; }
         public double Memory { get; internal set; }
         public int Iteration { get; internal set; }
 
@@ -23,8 +23,8 @@ namespace PerformanceInside
         internal void FillData(object sourceObject, string caller)
         {
             SourceType = sourceObject != null ?
-                (sourceObject is Type ? (Type)sourceObject :
-                sourceObject.GetType()) : null;                                  
+                (sourceObject is Type || sourceObject is string ? sourceObject.ToString() :                
+                sourceObject.GetType().ToString()) : null;                                  
             EnvironmentMethod = caller;
             Iteration++;
         }
