@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace PerformanceInside
+namespace Neo.PerformanceInside
 {
     public class PerformanceMeasure
     {       

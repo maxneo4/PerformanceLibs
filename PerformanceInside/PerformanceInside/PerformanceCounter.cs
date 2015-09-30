@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace PerformanceInside
+namespace Neo.PerformanceInside
 {
     internal class PerformanceCounter
     {

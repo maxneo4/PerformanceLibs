@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 
-namespace PerformanceInside
+namespace Neo.PerformanceInside
 {
     public static class DataGenerator
     {
@@ -30,5 +31,15 @@ namespace PerformanceInside
             return arrayObjects;
         }
 
+        public static IEnumerable<T> GenerateEnumerable<T>(T[] sampleObjects, int length)
+        {
+            int sampleObjectsLength = sampleObjects.Length;
+            int count = -1;
+            while (count < length -1 )
+            {
+                count++;
+                yield return sampleObjects[count % sampleObjectsLength];
+            }
+        }
     }
 }

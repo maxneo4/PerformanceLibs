@@ -1,13 +1,13 @@
 ﻿using System.Text;
 
-namespace PerformanceInside
+namespace Neo.PerformanceInside
 {
     internal class PerformanceReportWritter
     {
 
         #region Constants
 
-        internal const string reportColumnHeaders = "SourceType\tEnvironmentMethod\tSeconds\tMiliseconds\tTicks\tIteration\tMemory\tCustomData";
+        internal const string reportColumnHeaders = "SourceType\tEnvironmentMethod\tSeconds\tMiliseconds\tTicks\tIteration\tMemory(Kb)\tCustomData";
 
         #endregion
 

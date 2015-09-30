@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace PerformanceInside
+namespace Neo.PerformanceInside
 {
     public class StopMemory
     {
         #region Constants
 
-        internal const double BYTES_BY_MEGA = 1048576d;
+        internal const double BYTES_BY_KB = 1024d;
 
         #endregion
 
@@ -38,7 +38,7 @@ namespace PerformanceInside
         public void Stop()
         {
             _afterMemory = Process.GetCurrentProcess().VirtualMemorySize64;
-            Memory += (_afterMemory - _beforeMemory) / BYTES_BY_MEGA;
+            Memory += (_afterMemory - _beforeMemory) / BYTES_BY_KB;
         } 
         #endregion
     }

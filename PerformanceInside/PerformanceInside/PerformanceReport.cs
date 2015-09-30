@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PerformanceInside
+namespace Neo.PerformanceInside
 {
     public class PerformanceReport
     {       

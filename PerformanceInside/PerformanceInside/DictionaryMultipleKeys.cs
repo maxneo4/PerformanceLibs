@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PerformanceInside
+namespace Neo.PerformanceInside
 {
     internal class DictionaryMultipleKeys
     {

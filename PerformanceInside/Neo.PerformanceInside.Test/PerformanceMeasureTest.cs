@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PerformanceInside;
 using System.IO;
 
 namespace Neo.PerformanceInside.Test
