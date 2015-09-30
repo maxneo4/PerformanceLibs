@@ -7,11 +7,17 @@ namespace Neo.PerformanceInside.Test
     public  class PerformanceMeasureTest
     {
         
-        [TestCleanup]
+        [TestInitialize]
         public void Initialize()
         {
             PerformanceMeasure.Enabled = true;
-            PerformanceMeasure.Reset();
+            PerformanceReport.AutoOpenReport = false;
+        }
+
+        [TestCleanup]
+        public void CleanUp()
+        {            
+            PerformanceMeasure.Reset();            
             PerformanceReport.Clear();
         }
 
@@ -26,7 +32,7 @@ namespace Neo.PerformanceInside.Test
             PerformanceReport.AddHeaderData("Version", "10.6");
             PerformanceReport.AddHeaderData("Languages", 2500);
             PerformanceMeasure.CountTime(typeof(PerformanceMeasureTest), () => Process(inputs));
-            string performaceReport = PerformanceReport.GetReport();
+            string performaceReport = PerformanceReport.GenerateReport();
             //then
             Assert.IsNotNull(performaceReport);
             Assert.IsTrue(performaceReport.Contains("<base de datos : Abengoa> <Version : 10.6> <Languages : 2500> "));
@@ -59,7 +65,7 @@ namespace Neo.PerformanceInside.Test
             PerformanceReport.AddHeaderData("Version", "10.6");
             PerformanceReport.AddHeaderData("Languages", 2500);
             PerformanceMeasure.CountTimeAndMemory(typeof(PerformanceMeasureTest), () => result = Acumulate(inputs));
-            string performaceReport = PerformanceReport.GetReport();
+            string performaceReport = PerformanceReport.GenerateReport();
             //then
             Assert.IsNotNull(performaceReport);
             Assert.IsTrue(performaceReport.Contains("<base de datos : Abengoa> <Version : 10.6> <Languages : 2500> "));
@@ -91,7 +97,7 @@ namespace Neo.PerformanceInside.Test
             ProcessInputs(inputs, 2);
 
             //then
-            string performaceReport = PerformanceReport.GetReport();
+            string performaceReport = PerformanceReport.GenerateReport();
             Assert.IsTrue(performaceReport.Split('\n').Length == 3 + 3);
         }
 
@@ -105,7 +111,7 @@ namespace Neo.PerformanceInside.Test
             ProcessInputs(inputs, 3);
 
             //then
-            string performaceReport = PerformanceReport.GetReport();
+            string performaceReport = PerformanceReport.GenerateReport();
             Assert.IsTrue(performaceReport.Split('\n').Length == 4 + 3);
         }
 
@@ -119,7 +125,7 @@ namespace Neo.PerformanceInside.Test
             PerformanceMeasure.CountTimeAndMemory(this, () => ProcessInputs(inputs, 100));//100
 
             //then
-            string performaceReport = PerformanceReport.GetReport();
+            string performaceReport = PerformanceReport.GenerateReport();
             Assert.IsTrue(performaceReport.Split('\n').Length == 50 + 1 +3);
         }
 
@@ -155,7 +161,7 @@ namespace Neo.PerformanceInside.Test
             RunCustomProcess();
             //then
 
-            Assert.IsNotNull(PerformanceReport.GetReport());
+            Assert.IsNotNull(PerformanceReport.GenerateReport());
         }
         private void RunCustomProcess()
         {            

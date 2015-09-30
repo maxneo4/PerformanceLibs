@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Neo.PerformanceInside
@@ -11,6 +12,8 @@ namespace Neo.PerformanceInside
         internal static StringBuilder _headerData;
         internal static StringBuilder _reportData;
 
+        public static bool AutoOpenReport { get; set; }
+
         #endregion
 
         #region Constructor
@@ -19,6 +22,7 @@ namespace Neo.PerformanceInside
         {
             _headerData = new StringBuilder();
             _reportData = new StringBuilder();
+            AutoOpenReport = true;
         }
 
         #endregion
@@ -35,14 +39,19 @@ namespace Neo.PerformanceInside
             PerformanceReportWritter.AddDataToStringBuilder(performanceMeasure._currentPerformanceCounter._customData, key, value);
         }
 
-        public static string GetReport()
+        public static string GenerateReport(string fileReportPath = null)
         {
             _reportData.AppendLine(_headerData.ToString());
             _reportData.AppendLine(PerformanceReportWritter.reportColumnHeaders);
             foreach (KeyValuePair<Delegate, PerformanceMeasure> performanceMeasure in PerformanceMeasure._performanceMeasureByDelegate)            
                 foreach (PerformanceCounter performanceCounter in performanceMeasure.Value._perfomanceCounters)
                     PerformanceReportWritter.AddPerformanceCounterToStrigBuilder(_reportData, performanceCounter);
-            return _reportData.ToString();
+            string report = _reportData.ToString();
+            string pathReport = fileReportPath ?? "PeformanceReport.csv";
+            File.AppendAllText(pathReport, report);
+            if (AutoOpenReport)
+                System.Diagnostics.Process.Start(pathReport);
+            return report;
         }     
         
         public static void Clear()

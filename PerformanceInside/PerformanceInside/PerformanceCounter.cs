@@ -23,8 +23,9 @@ namespace Neo.PerformanceInside
         internal void FillData(object sourceObject, string caller)
         {
             SourceType = sourceObject != null ?
-                (sourceObject is Type || sourceObject is string ? sourceObject.ToString() :                
-                sourceObject.GetType().ToString()) : null;                                  
+                (sourceObject is Type? ((Type)sourceObject).Name :
+                sourceObject is string ? sourceObject.ToString() :                
+                sourceObject.GetType().Name.ToString()) : null;                                  
             EnvironmentMethod = caller;
             Iteration++;
         }
