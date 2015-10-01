@@ -8,8 +8,8 @@ namespace Neo.PerformanceInside
         internal StringBuilder _customData;
 
         public TimeSpan TimeSpan { get; internal set; }  
-        public string EnvironmentMethod { get; internal set; }
-        public string SourceType { get; internal set; }
+        public string CallerMethod { get; internal set; }
+        public string Source { get; internal set; }
         public double Memory { get; internal set; }
         public int Iteration { get; internal set; }
 
@@ -23,11 +23,11 @@ namespace Neo.PerformanceInside
 
         internal void FillData(object sourceObject, string caller)
         {
-            SourceType = sourceObject != null ?
+            Source = sourceObject != null ?
                 (sourceObject is Type? ((Type)sourceObject).Name :
                 sourceObject is string ? sourceObject.ToString() :                
                 sourceObject.GetType().Name.ToString()) : null;                                  
-            EnvironmentMethod = caller;
+            CallerMethod = caller;
             Iteration++;
         }
     }

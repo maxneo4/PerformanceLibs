@@ -41,16 +41,18 @@ namespace Neo.PerformanceInside
 
         public static string GenerateReport(string fileReportPath = null)
         {
+            if (!PerformanceMeasure.Enabled)
+                return null;
             _reportData.AppendLine(_headerData.ToString());
             _reportData.AppendLine(PerformanceReportWritter.reportColumnHeaders);
-            foreach (KeyValuePair<string, PerformanceMeasure> performanceMeasure in PerformanceMeasure._performanceMeasureByDelegate)            
+            foreach (KeyValuePair<DictionaryMultipleKeys, PerformanceMeasure> performanceMeasure in PerformanceMeasure._performanceMeasureByDelegate)            
                 foreach (PerformanceCounter performanceCounter in performanceMeasure.Value._perfomanceCounters)
                     PerformanceReportWritter.AddPerformanceCounterToStrigBuilder(_reportData, performanceCounter);
             string report = _reportData.ToString();
             string pathReport = fileReportPath ?? "PeformanceReport.csv";
             File.AppendAllText(pathReport, report);
-            if (AutoOpenReport)
-                System.Diagnostics.Process.Start(pathReport);
+            if (AutoOpenReport)            
+                System.Diagnostics.Process.Start(pathReport);            
             return report;
         }     
         

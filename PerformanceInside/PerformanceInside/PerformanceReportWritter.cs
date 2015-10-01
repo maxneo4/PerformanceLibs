@@ -7,7 +7,8 @@ namespace Neo.PerformanceInside
 
         #region Constants
 
-        internal const string reportColumnHeaders = "SourceType\tEnvironmentMethod\tSeconds\tMiliseconds\tTicks\tIteration\tMemory(Kb)\tCustomData";
+        static string tab = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+        internal static  readonly string reportColumnHeaders = string.Format("CallerMethod{0}Source{0}Seconds{0}Miliseconds{0}Ticks{0}Iteration{0}Memory(Kb){0}CustomData", tab);
 
         #endregion
 
@@ -18,8 +19,8 @@ namespace Neo.PerformanceInside
 
         internal static void AddPerformanceCounterToStrigBuilder(StringBuilder stringBuilder, PerformanceCounter performanceCounter)
         {
-            const string tab = "\t";
-            stringBuilder.Append(performanceCounter.SourceType).Append(tab).Append(performanceCounter.EnvironmentMethod).Append(tab)
+            
+            stringBuilder.Append(performanceCounter.CallerMethod).Append(tab).Append(performanceCounter.Source).Append(tab)
                 .Append(performanceCounter.TimeSpan.Seconds).Append(tab).
                 Append(performanceCounter.TimeSpan.Milliseconds).Append(tab).Append(performanceCounter.TimeSpan.Ticks).Append(tab).Append(performanceCounter.Iteration).Append(tab).
                 Append(performanceCounter.Memory).Append(tab).Append(performanceCounter._customData).AppendLine();

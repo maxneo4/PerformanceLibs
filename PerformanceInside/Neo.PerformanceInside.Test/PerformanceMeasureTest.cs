@@ -33,6 +33,7 @@ namespace Neo.PerformanceInside.Test
             PerformanceReport.AddHeaderData("Version", "10.6");
             PerformanceReport.AddHeaderData("Languages", 2500);
             PerformanceMeasure.CountTime(typeof(PerformanceMeasureTest), () => Process(inputs));
+            PerformanceReport.AutoOpenReport = true;
             string performaceReport = PerformanceReport.GenerateReport();
             //then
             Assert.IsNotNull(performaceReport);

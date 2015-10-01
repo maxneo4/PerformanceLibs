@@ -17,11 +17,11 @@ namespace Neo.PerformanceInside
                 
         #endregion
                 
-        internal static Dictionary<string, PerformanceMeasure> _performanceMeasureByDelegate;
+        internal static Dictionary<DictionaryMultipleKeys, PerformanceMeasure> _performanceMeasureByDelegate;
         internal static PerformanceMeasure _currentPerformanceMeasure;
-        internal static PerformanceMeasure GetPerformanceMeasure(Delegate function)
+        internal static PerformanceMeasure GetPerformanceMeasure(object source, Delegate function)
         {
-            string func = function.ToString();
+            DictionaryMultipleKeys func = new DictionaryMultipleKeys(source, function);
             _currentPerformanceMeasure = _performanceMeasureByDelegate.ContainsKey(func) ? _performanceMeasureByDelegate[func] : (_performanceMeasureByDelegate[func] = new PerformanceMeasure());
             return _currentPerformanceMeasure;
        }
@@ -31,7 +31,7 @@ namespace Neo.PerformanceInside
         static PerformanceMeasure()
         {
             Enabled = true;
-            _performanceMeasureByDelegate = new Dictionary<string, PerformanceMeasure>();
+            _performanceMeasureByDelegate = new Dictionary<DictionaryMultipleKeys, PerformanceMeasure>();
         }
 
         private PerformanceMeasure()
@@ -50,7 +50,7 @@ namespace Neo.PerformanceInside
         {
             if (Enabled)
             {
-                PerformanceMeasure performanceMeasure = GetPerformanceMeasure(action);
+                PerformanceMeasure performanceMeasure = GetPerformanceMeasure(sourceObject, action);
                 performanceMeasure.TakePerformanceMeasure(sourceObject, action, iterationPack, caller);
             }
             else action();
@@ -60,7 +60,7 @@ namespace Neo.PerformanceInside
         {
             if (Enabled)
             {
-                PerformanceMeasure performanceMeasure = GetPerformanceMeasure(func);
+                PerformanceMeasure performanceMeasure = GetPerformanceMeasure(sourceObject, func);
                 performanceMeasure.TakePerformanceMeasure(sourceObject, func, iterationPack, caller);
             }
             else func();
@@ -70,7 +70,7 @@ namespace Neo.PerformanceInside
         {
             if (Enabled)
             {
-                PerformanceMeasure performanceMeasure = GetPerformanceMeasure(action);
+                PerformanceMeasure performanceMeasure = GetPerformanceMeasure(sourceObject, action);
                 performanceMeasure.TakePerformanceMeasure(sourceObject, action, iterationPack, caller, true);
             }
             else action();
@@ -80,7 +80,7 @@ namespace Neo.PerformanceInside
         {
             if (Enabled)
             {
-                PerformanceMeasure performanceMeasure = GetPerformanceMeasure(func);
+                PerformanceMeasure performanceMeasure = GetPerformanceMeasure(sourceObject, func);
                 performanceMeasure.TakePerformanceMeasure(sourceObject, func, iterationPack, caller, true);
             }
             else func();
@@ -88,7 +88,7 @@ namespace Neo.PerformanceInside
 
         public static void Reset()
         {
-            _performanceMeasureByDelegate = new Dictionary<string, PerformanceMeasure>();
+            _performanceMeasureByDelegate = new Dictionary<DictionaryMultipleKeys, PerformanceMeasure>();
         }
 
         #region Private methods
