@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Neo.PerformanceInside
 {
@@ -48,13 +49,23 @@ namespace Neo.PerformanceInside
             foreach (KeyValuePair<DictionaryMultipleKeys, PerformanceMeasure> performanceMeasure in PerformanceMeasure._performanceMeasureByDelegate)            
                 foreach (PerformanceCounter performanceCounter in performanceMeasure.Value._perfomanceCounters)
                     PerformanceReportWritter.AddPerformanceCounterToStrigBuilder(_reportData, performanceCounter);
-            string report = _reportData.ToString();
-            string pathReport = fileReportPath ?? "PeformanceReport.csv";
+            string report = _reportData.ToString();           
+            string pathReport = fileReportPath ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PeformanceReport.csv");
             File.AppendAllText(pathReport, report);
             if (AutoOpenReport)            
                 System.Diagnostics.Process.Start(pathReport);            
             return report;
-        }     
+        } 
+        
+        public static string GenerateReportAndSetToClipboard(string fileReportPath = null)
+        {
+            string report = GenerateReport(fileReportPath);
+            report = report.Replace(PerformanceReportWritter.tab, "\t");
+            try
+            { Clipboard.SetText(report); }
+            catch { } //Si se intenta correr en un hilo que no sea el de los windows forms
+            return report;
+        }    
         
         public static void Clear()
         {

@@ -7,7 +7,7 @@ namespace Neo.PerformanceInside
 
         #region Constants
 
-        static string tab = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+        internal static string tab = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
         internal static  readonly string reportColumnHeaders = string.Format("CallerMethod{0}Source{0}Seconds{0}Miliseconds{0}Ticks{0}Iteration{0}Memory(Kb){0}CustomData", tab);
 
         #endregion

@@ -34,7 +34,7 @@ namespace Neo.PerformanceInside.Test
             PerformanceReport.AddHeaderData("Languages", 2500);
             PerformanceMeasure.CountTime(typeof(PerformanceMeasureTest), () => Process(inputs));
             PerformanceReport.AutoOpenReport = true;
-            string performaceReport = PerformanceReport.GenerateReport();
+            string performaceReport = PerformanceReport.GenerateReportAndSetToClipboard();
             //then
             Assert.IsNotNull(performaceReport);
             Assert.IsTrue(performaceReport.Contains("<base de datos : Abengoa> <Version : 10.6> <Languages : 2500> "));
@@ -61,8 +61,6 @@ namespace Neo.PerformanceInside.Test
             string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 3500);
             string result = null;
             //when
-            PerformanceMeasure.Enabled = false;
-
             PerformanceReport.AddHeaderData("base de datos", "Abengoa");
             PerformanceReport.AddHeaderData("Version", "10.6");
             PerformanceReport.AddHeaderData("Languages", 2500);
@@ -71,8 +69,8 @@ namespace Neo.PerformanceInside.Test
             //then
             Assert.IsNotNull(performaceReport);
             Assert.IsTrue(performaceReport.Contains("<base de datos : Abengoa> <Version : 10.6> <Languages : 2500> "));
-            Assert.IsFalse(performaceReport.Contains("<length inputs : 3500> "));            
-            Assert.IsFalse(performaceReport.Contains("MeasureProcessStringArrayFunctionTest"));
+            Assert.IsTrue(performaceReport.Contains("<length inputs : 3500> "));            
+            Assert.IsTrue(performaceReport.Contains("MeasureProcessStringArrayFunctionTest"));
         }
 
         private static string Acumulate(string[] inputs)
