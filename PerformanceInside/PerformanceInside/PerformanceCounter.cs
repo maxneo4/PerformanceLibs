@@ -13,11 +13,12 @@ namespace Neo.PerformanceInside
         public double Memory { get; internal set; }
         public int Iteration { get; internal set; }
 
+        internal int PackagePosition { get; set; }
+
         public PerformanceCounter(int iterationInitial)
         {
             Iteration = iterationInitial;
-            _customData = new StringBuilder();
-            TimeSpan = new TimeSpan();            
+            _customData = new StringBuilder();                        
         }
 
         internal void FillData(object sourceObject, string caller)

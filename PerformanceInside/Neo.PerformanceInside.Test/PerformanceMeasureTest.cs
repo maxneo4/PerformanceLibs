@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
+using System;
 
 namespace Neo.PerformanceInside.Test
 {
@@ -131,7 +132,7 @@ namespace Neo.PerformanceInside.Test
 
         private static string _result;
 
-        private static void ProcessInputs(string[] inputs, int every)
+        private static void ProcessInputs(string[] inputs,params int[] every)
         {            
             string result = "";
             for (int i = 0; i < inputs.Length; i++)
@@ -148,6 +149,34 @@ namespace Neo.PerformanceInside.Test
             _result += inputs[i];            
             return _result;
         }
+
+        #endregion
+
+        #region DuplicateMeasureIteration
+        [TestMethod]
+        public void MeasureDuplicateMeasureIterationTest()
+        {
+            //given
+            string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 100);            
+            //when        
+            IterateAllInputs(inputs);
+            string performaceReport = PerformanceReport.GenerateReport();
+            //then       
+            int numberLines = performaceReport.Split('\n').Length;
+            Assert.IsTrue(numberLines  == 7);
+        }
+
+        private void IterateAllInputs(string[] inputs)
+        {
+            foreach (string item in inputs)
+                PerformanceMeasure.CountTime(this, () => DoSome(item), new[] { 2, 20, 50 });
+        }
+
+        private static string DoSome(string item)
+        {
+            return item.Substring(0, 1);
+        }
+
         #endregion
 
         #region Interfaces implementation

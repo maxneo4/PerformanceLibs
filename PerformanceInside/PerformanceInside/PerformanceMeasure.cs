@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 namespace Neo.PerformanceInside
 {
     public class PerformanceMeasure
-    {       
+    {               
 
         #region Fields
 
@@ -17,10 +17,11 @@ namespace Neo.PerformanceInside
                 
         #endregion
                 
-        internal static Dictionary<Delegate, PerformanceMeasure> _performanceMeasureByDelegate;
+        internal static Dictionary<string, PerformanceMeasure> _performanceMeasureByDelegate;
         internal static PerformanceMeasure _currentPerformanceMeasure;
-        internal static PerformanceMeasure GetPerformanceMeasure(Delegate func)
-        {            
+        internal static PerformanceMeasure GetPerformanceMeasure(Delegate function)
+        {
+            string func = function.ToString();
             _currentPerformanceMeasure = _performanceMeasureByDelegate.ContainsKey(func) ? _performanceMeasureByDelegate[func] : (_performanceMeasureByDelegate[func] = new PerformanceMeasure());
             return _currentPerformanceMeasure;
        }
@@ -30,7 +31,7 @@ namespace Neo.PerformanceInside
         static PerformanceMeasure()
         {
             Enabled = true;
-            _performanceMeasureByDelegate = new Dictionary<Delegate, PerformanceMeasure>();
+            _performanceMeasureByDelegate = new Dictionary<string, PerformanceMeasure>();
         }
 
         private PerformanceMeasure()
@@ -43,8 +44,9 @@ namespace Neo.PerformanceInside
         #endregion
 
         public static bool Enabled { get; set; }
+        internal readonly int[] DEF_ITERATIONPACK = new[] { 1 };
 
-        public static void CountTime(object sourceObject, Action action, int iterationPack = 1, [CallerMemberName]string caller = "None")
+        public static void CountTime(object sourceObject, Action action, int[] iterationPack = null, [CallerMemberName]string caller = "None")
         {
             if (Enabled)
             {
@@ -54,7 +56,7 @@ namespace Neo.PerformanceInside
             else action();
         }
 
-        public static void CountTime(object sourceObject, Func<object> func, int iterationPack = 1, [CallerMemberName]string caller = "None")
+        public static void CountTime(object sourceObject, Func<object> func, int[] iterationPack = null, [CallerMemberName]string caller = "None")
         {
             if (Enabled)
             {
@@ -64,7 +66,7 @@ namespace Neo.PerformanceInside
             else func();
         }
 
-        public static void CountTimeAndMemory(object sourceObject, Action action, int iterationPack = 1, [CallerMemberName]string caller = "None")
+        public static void CountTimeAndMemory(object sourceObject, Action action, int[] iterationPack = null, [CallerMemberName]string caller = "None")
         {
             if (Enabled)
             {
@@ -74,7 +76,7 @@ namespace Neo.PerformanceInside
             else action();
         }
 
-        public static void CountTimeAndMemory(object sourceObject, Func<object> func, int iterationPack = 1, [CallerMemberName]string caller = "None")
+        public static void CountTimeAndMemory(object sourceObject, Func<object> func, int[] iterationPack = null, [CallerMemberName]string caller = "None")
         {
             if (Enabled)
             {
@@ -86,26 +88,34 @@ namespace Neo.PerformanceInside
 
         public static void Reset()
         {
-            _performanceMeasureByDelegate = new Dictionary<Delegate, PerformanceMeasure>();
+            _performanceMeasureByDelegate = new Dictionary<string, PerformanceMeasure>();
         }
 
         #region Private methods
 
-        private void TakePerformanceMeasure(object sourceObject, Delegate func, int iterationPack, string caller, bool measureMemory = false)
+        private void TakePerformanceMeasure(object sourceObject, Delegate func, int[] iterationPack, string caller, bool measureMemory = false)
         {
+            iterationPack = iterationPack?? DEF_ITERATIONPACK;
             IteratePerformanceCounter(iterationPack);
             if (measureMemory) RunAndTakeMemory( ()=>Run(func) );
             else Run(func);
             _currentPerformanceCounter.FillData(sourceObject, caller);
         }
 
-        private void IteratePerformanceCounter(int iterationPack)
+        private void IteratePerformanceCounter(int[] iterationPack)
         {
             bool isTheFirstCounter = _currentPerformanceCounter == null;
-            if (isTheFirstCounter || _currentPerformanceCounter.Iteration % iterationPack == 0)
+            if (isTheFirstCounter || _currentPerformanceCounter.Iteration % iterationPack[_currentPerformanceCounter.PackagePosition] == 0)
             {
                 int iterationInitial = isTheFirstCounter ? 0 : _currentPerformanceCounter.Iteration;
+                int packagePosition = isTheFirstCounter ? 0 :
+                    _currentPerformanceCounter.PackagePosition < iterationPack.Length - 1 ?
+                    _currentPerformanceCounter.PackagePosition + 1 : _currentPerformanceCounter.PackagePosition;
+                TimeSpan currentTimeSpan = isTheFirstCounter? new TimeSpan() : _currentPerformanceCounter.TimeSpan;
+
                 _currentPerformanceCounter = new PerformanceCounter(iterationInitial);
+                _currentPerformanceCounter.PackagePosition = packagePosition;                
+                _currentPerformanceCounter.TimeSpan = currentTimeSpan;
                 _perfomanceCounters.Add(_currentPerformanceCounter);
             }
         }
