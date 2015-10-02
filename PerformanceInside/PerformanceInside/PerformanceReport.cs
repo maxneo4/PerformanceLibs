@@ -13,8 +13,6 @@ namespace Neo.PerformanceInside
         internal static StringBuilder _headerData;
         internal static StringBuilder _reportData;
 
-        public static bool AutoOpenReport { get; set; }
-
         #endregion
 
         #region Constructor
@@ -22,8 +20,7 @@ namespace Neo.PerformanceInside
         static PerformanceReport()
         {
             _headerData = new StringBuilder();
-            _reportData = new StringBuilder();
-            AutoOpenReport = true;
+            _reportData = new StringBuilder();            
         }
 
         #endregion
@@ -40,31 +37,37 @@ namespace Neo.PerformanceInside
             PerformanceReportWritter.AddDataToStringBuilder(performanceMeasure._currentPerformanceCounter._customData, key, value);
         }
 
-        public static string GenerateReport(string fileReportPath = null)
+        public static string GenerateReport()
         {
-            if (!PerformanceMeasure.Enabled)
+            if (!PerformanceConfiguration.EnabledMeasure)
                 return null;
+            FillReportData();
+            string report = _reportData.ToString();
+            string nameReport = string.Format("{0}_{1}.csv", PerformanceConfiguration.ReportName, DateTime.Now.ToString("ddMMMyyyy HH-mm"));
+            string pathReport = Path.Combine(PerformanceConfiguration.ParentFolderReport, nameReport);
+            File.AppendAllText(pathReport, report);
+            if (PerformanceConfiguration.AutoOpenReport)
+                System.Diagnostics.Process.Start(pathReport);
+            if (PerformanceConfiguration.CopyReportToClipboard)
+                SetReportToClipboard(report);
+            return report;
+        }
+
+        private static void FillReportData()
+        {
             _reportData.AppendLine(_headerData.ToString());
             _reportData.AppendLine(PerformanceReportWritter.reportColumnHeaders);
-            foreach (KeyValuePair<DictionaryMultipleKeys, PerformanceMeasure> performanceMeasure in PerformanceMeasure._performanceMeasureByDelegate)            
+            foreach (KeyValuePair<DictionaryMultipleKeys, PerformanceMeasure> performanceMeasure in PerformanceMeasure._performanceMeasureByDelegate)
                 foreach (PerformanceCounter performanceCounter in performanceMeasure.Value._perfomanceCounters)
                     PerformanceReportWritter.AddPerformanceCounterToStrigBuilder(_reportData, performanceCounter);
-            string report = _reportData.ToString();           
-            string pathReport = fileReportPath ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PeformanceReport.csv");
-            File.AppendAllText(pathReport, report);
-            if (AutoOpenReport)            
-                System.Diagnostics.Process.Start(pathReport);            
-            return report;
-        } 
-        
-        public static string GenerateReportAndSetToClipboard(string fileReportPath = null)
-        {
-            string report = GenerateReport(fileReportPath);
+        }
+
+        private static void SetReportToClipboard(string report)
+        {            
             report = report.Replace(PerformanceReportWritter.tab, "\t");
             try
             { Clipboard.SetText(report); }
-            catch { } //Si se intenta correr en un hilo que no sea el de los windows forms
-            return report;
+            catch { } //Si se intenta correr en un hilo que no sea el de los windows forms           
         }    
         
         public static void Clear()

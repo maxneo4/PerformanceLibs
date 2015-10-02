@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="DataGenerator.cs" />
     <Compile Include="DictionaryMultipleKeys.cs" />
+    <Compile Include="PerformanceConfiguration.cs" />
     <Compile Include="PerformanceCounter.cs" />
     <Compile Include="PerformanceMeasure.cs" />
     <Compile Include="PerformanceReport.cs" />

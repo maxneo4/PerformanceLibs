@@ -11,8 +11,8 @@ namespace Neo.PerformanceInside.Test
         [TestInitialize]
         public void Initialize()
         {
-            PerformanceMeasure.Enabled = true;
-            PerformanceReport.AutoOpenReport = false;
+            PerformanceConfiguration.AutoOpenReport = false;
+            PerformanceConfiguration.CopyReportToClipboard = false;
         }
 
         [TestCleanup]
@@ -33,8 +33,9 @@ namespace Neo.PerformanceInside.Test
             PerformanceReport.AddHeaderData("Version", "10.6");
             PerformanceReport.AddHeaderData("Languages", 2500);
             PerformanceMeasure.CountTime(typeof(PerformanceMeasureTest), () => Process(inputs));
-            PerformanceReport.AutoOpenReport = true;
-            string performaceReport = PerformanceReport.GenerateReportAndSetToClipboard();
+            PerformanceConfiguration.AutoOpenReport = true;
+            PerformanceConfiguration.CopyReportToClipboard = true;
+            string performaceReport = PerformanceReport.GenerateReport();
             //then
             Assert.IsNotNull(performaceReport);
             Assert.IsTrue(performaceReport.Contains("<base de datos : Abengoa> <Version : 10.6> <Languages : 2500> "));
@@ -188,8 +189,10 @@ namespace Neo.PerformanceInside.Test
             //when
             RunCustomProcess();
             //then
-
-            Assert.IsNotNull(PerformanceReport.GenerateReport());
+            string report = PerformanceReport.GenerateReport();
+            Assert.IsNotNull(report);
+            Assert.IsTrue(report.Contains("ProcessA"));
+            Assert.IsTrue(report.Contains("ProcessB"));
         }
         private void RunCustomProcess()
         {            

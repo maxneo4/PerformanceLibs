@@ -29,9 +29,8 @@ namespace Neo.PerformanceInside
         #region Constructor
 
         static PerformanceMeasure()
-        {
-            Enabled = true;
-            _performanceMeasureByDelegate = new Dictionary<DictionaryMultipleKeys, PerformanceMeasure>();
+        {            
+            _performanceMeasureByDelegate = new Dictionary<DictionaryMultipleKeys, PerformanceMeasure>();            
         }
 
         private PerformanceMeasure()
@@ -42,13 +41,12 @@ namespace Neo.PerformanceInside
         }
 
         #endregion
-
-        public static bool Enabled { get; set; }
+                
         internal readonly int[] DEF_ITERATIONPACK = new[] { 1 };
 
         public static void CountTime(object sourceObject, Action action, int[] iterationPack = null, [CallerMemberName]string caller = "None")
         {
-            if (Enabled)
+            if (PerformanceConfiguration.EnabledMeasure)
             {
                 PerformanceMeasure performanceMeasure = GetPerformanceMeasure(sourceObject, action);
                 performanceMeasure.TakePerformanceMeasure(sourceObject, action, iterationPack, caller);
@@ -58,7 +56,7 @@ namespace Neo.PerformanceInside
 
         public static void CountTime(object sourceObject, Func<object> func, int[] iterationPack = null, [CallerMemberName]string caller = "None")
         {
-            if (Enabled)
+            if (PerformanceConfiguration.EnabledMeasure)
             {
                 PerformanceMeasure performanceMeasure = GetPerformanceMeasure(sourceObject, func);
                 performanceMeasure.TakePerformanceMeasure(sourceObject, func, iterationPack, caller);
@@ -68,7 +66,7 @@ namespace Neo.PerformanceInside
 
         public static void CountTimeAndMemory(object sourceObject, Action action, int[] iterationPack = null, [CallerMemberName]string caller = "None")
         {
-            if (Enabled)
+            if (PerformanceConfiguration.EnabledMeasure)
             {
                 PerformanceMeasure performanceMeasure = GetPerformanceMeasure(sourceObject, action);
                 performanceMeasure.TakePerformanceMeasure(sourceObject, action, iterationPack, caller, true);
@@ -78,7 +76,7 @@ namespace Neo.PerformanceInside
 
         public static void CountTimeAndMemory(object sourceObject, Func<object> func, int[] iterationPack = null, [CallerMemberName]string caller = "None")
         {
-            if (Enabled)
+            if (PerformanceConfiguration.EnabledMeasure)
             {
                 PerformanceMeasure performanceMeasure = GetPerformanceMeasure(sourceObject, func);
                 performanceMeasure.TakePerformanceMeasure(sourceObject, func, iterationPack, caller, true);
