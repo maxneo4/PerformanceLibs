@@ -15,7 +15,7 @@ namespace Neo.PerformanceInside
             EnabledMeasure = true;
             AutoOpenReport = true;
             CopyReportToClipboard = true;
-            ParentFolderReport = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            ParentFolderReport = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase);//Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             ReportName = "PerformanceReport";
         }
     }
