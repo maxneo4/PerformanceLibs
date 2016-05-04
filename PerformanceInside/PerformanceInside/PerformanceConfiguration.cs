@@ -6,8 +6,7 @@ namespace Neo.PerformanceInside
     {
         public static string ReportName { get; set; }
         public static string ParentFolderReport { get; set; }
-        public static bool EnabledMeasure { get { return true; }
-        set { AutoOpenReport = value; } }
+        public static bool EnabledMeasure { get; set; }
         public static bool AutoOpenReport { get; set; }
         public static bool CopyReportToClipboard { get; set; }
 

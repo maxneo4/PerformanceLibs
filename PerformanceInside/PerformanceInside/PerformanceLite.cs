@@ -25,8 +25,8 @@ namespace Neo.PerformanceInside
             _stopWatch = new Stopwatch();
             _outPutFolder = outPutFolder;
             _tab = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
-            _headers = string.Format("Description{0}Seconds{0}MiliSeconds{0}TotalMiliSeconds{1}", _tab, Environment.NewLine);
-            _row = "{1}{0}{2}{0}{3}{0}{4}"+Environment.NewLine;
+            _headers = string.Format("Description{0}Minutes{0}Seconds{0}MiliSeconds{0}TotalMiliSeconds{1}", _tab, Environment.NewLine);
+            _row = "{1}{0}{2}{0}{3}{0}{4}{0}{5}"+Environment.NewLine;
             _reportName = string.Format("{0}_{1}.csv", reportName, DateTime.Now.ToString("ddMMMyyyy HH-mm"));
             _pathReport = Path.Combine(_outPutFolder, _reportName);
         }
@@ -44,7 +44,7 @@ namespace Neo.PerformanceInside
     public void CountTime(string description)
     {
         _stopWatch.Stop();
-        string row = string.Format(_row, _tab, description, _stopWatch.Elapsed.Seconds, _stopWatch.Elapsed.Milliseconds, _stopWatch.ElapsedMilliseconds);
+        string row = string.Format(_row, _tab, description, _stopWatch.Elapsed.Minutes, _stopWatch.Elapsed.Seconds, _stopWatch.Elapsed.Milliseconds, _stopWatch.ElapsedMilliseconds);
         File.AppendAllText(_pathReport, row);
         _stopWatch.Restart();
     }
