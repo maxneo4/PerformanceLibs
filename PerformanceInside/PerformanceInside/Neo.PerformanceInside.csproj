@@ -55,6 +55,7 @@
     <Compile Include="PerformanceConfiguration.cs" />
     <Compile Include="PerformanceCounter.cs" />
     <Compile Include="PerformanceLite.cs" />
+    <Compile Include="PerformanceLiteOutPut.cs" />
     <Compile Include="PerformanceMeasure.cs" />
     <Compile Include="PerformanceReport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
