@@ -16,7 +16,14 @@ namespace Neo.PerformanceInside
 
         public static PerformanceLite GetInstance(string key)
         {
-            return _instances[key];
+            return _instances.ContainsKey(key)? _instances[key] : null;
+        }
+
+        public static void CountTime(string key, string description)
+        {
+            PerformanceLite instance = GetInstance(key);
+            if (instance != null)
+                instance.CountTime(description);
         }
 
         public static void SetInstance(string key, PerformanceLite performanceLite)
@@ -43,6 +50,8 @@ namespace Neo.PerformanceInside
 
         public PerformanceLite(string reportName, Action<string> alternativeActionIfErrorFile = null)
         {
+            if (OutPutFolder == null)
+                OutPutFolder = string.Empty;
             if (alternativeActionIfErrorFile == null)
                 alternativeActionIfErrorFile = (s) => Trace.Write(s);
             _outPutWriter = new PerformanceLiteFileOutPut(OutPutFolder, reportName);            
@@ -50,8 +59,8 @@ namespace Neo.PerformanceInside
             _stopWatch = new Stopwatch();            
             _stopMemory = new StopMemory();
             _tab = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
-            _headers = string.Format("Description{0}Hours{0}Minutes{0}Seconds{0}MiliSeconds{0}TotalMiliSeconds{0}Memory(kb){1}", _tab, Environment.NewLine);
-            _row = "{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}{6}{0}{7}" + Environment.NewLine;
+            _headers = string.Format("Description{0}Hours{0}Minutes{0}Seconds{0}MiliSeconds{0}TotalMiliSeconds{0}Memory(kb){0}Current Memory(kb){1}", _tab, Environment.NewLine);
+            _row = "{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}{6}{0}{7}{0}{8}" + Environment.NewLine;
         }  
 
         #endregion
@@ -71,7 +80,8 @@ namespace Neo.PerformanceInside
             _stopWatch.Stop();
             if (CountMemory)
                 _stopMemory.Stop();
-            string row = string.Format(_row, _tab, description, _stopWatch.Elapsed.Hours, _stopWatch.Elapsed.Minutes, _stopWatch.Elapsed.Seconds, _stopWatch.Elapsed.Milliseconds, _stopWatch.ElapsedMilliseconds, _stopMemory.Memory);
+            string row = string.Format(_row, _tab, description, _stopWatch.Elapsed.Hours, _stopWatch.Elapsed.Minutes, _stopWatch.Elapsed.Seconds, 
+                                _stopWatch.Elapsed.Milliseconds, _stopWatch.ElapsedMilliseconds, _stopMemory.Memory, _stopMemory.CurrentMemory);
             Write(row);
             _stopWatch.Restart();
             if (CountMemory)
