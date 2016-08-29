@@ -58,7 +58,7 @@ namespace Neo.PerformanceInside
             _reportData.AppendLine(_headerData.ToString());
             _reportData.AppendLine(PerformanceReportWritter.reportColumnHeaders);
             foreach (KeyValuePair<DictionaryMultipleKeys, PerformanceMeasure> performanceMeasure in PerformanceMeasure._performanceMeasureByDelegate)
-                foreach (PerformanceCounter performanceCounter in performanceMeasure.Value._perfomanceCounters)
+                foreach (NeoPerformanceCounter performanceCounter in performanceMeasure.Value._perfomanceCounters)
                     PerformanceReportWritter.AddPerformanceCounterToStrigBuilder(_reportData, performanceCounter);
         }
 

@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Neo.PerformanceInside
 {
-    internal class PerformanceCounter
+    internal class NeoPerformanceCounter
     {
         internal StringBuilder _customData;
 
@@ -15,7 +15,7 @@ namespace Neo.PerformanceInside
 
         internal int PackagePosition { get; set; }
 
-        public PerformanceCounter(int iterationInitial)
+        public NeoPerformanceCounter(int iterationInitial)
         {
             Iteration = iterationInitial;
             _customData = new StringBuilder();                        

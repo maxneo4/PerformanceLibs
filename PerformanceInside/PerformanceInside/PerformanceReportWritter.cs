@@ -17,7 +17,7 @@ namespace Neo.PerformanceInside
             stringBuilder.Append("<").Append(key).Append(" : ").Append(value).Append("> ");
         }
 
-        internal static void AddPerformanceCounterToStrigBuilder(StringBuilder stringBuilder, PerformanceCounter performanceCounter)
+        internal static void AddPerformanceCounterToStrigBuilder(StringBuilder stringBuilder, NeoPerformanceCounter performanceCounter)
         {
             
             stringBuilder.Append(performanceCounter.CallerMethod).Append(tab).Append(performanceCounter.Source).Append(tab)

@@ -12,8 +12,8 @@ namespace Neo.PerformanceInside
 
         Stopwatch _stopWatch;
         StopMemory _stopMemory;
-        internal PerformanceCounter _currentPerformanceCounter;
-        internal List<PerformanceCounter> _perfomanceCounters;
+        internal NeoPerformanceCounter _currentPerformanceCounter;
+        internal List<NeoPerformanceCounter> _perfomanceCounters;
                 
         #endregion
                 
@@ -37,7 +37,7 @@ namespace Neo.PerformanceInside
         {
             _stopWatch = new Stopwatch();
             _stopMemory = new StopMemory();            
-            _perfomanceCounters = new List<PerformanceCounter>();                           
+            _perfomanceCounters = new List<NeoPerformanceCounter>();                           
         }
 
         #endregion
@@ -111,7 +111,7 @@ namespace Neo.PerformanceInside
                     _currentPerformanceCounter.PackagePosition + 1 : _currentPerformanceCounter.PackagePosition;
                 TimeSpan currentTimeSpan = isTheFirstCounter? new TimeSpan() : _currentPerformanceCounter.TimeSpan;
 
-                _currentPerformanceCounter = new PerformanceCounter(iterationInitial);
+                _currentPerformanceCounter = new NeoPerformanceCounter(iterationInitial);
                 _currentPerformanceCounter.PackagePosition = packagePosition;                
                 _currentPerformanceCounter.TimeSpan = currentTimeSpan;
                 _perfomanceCounters.Add(_currentPerformanceCounter);

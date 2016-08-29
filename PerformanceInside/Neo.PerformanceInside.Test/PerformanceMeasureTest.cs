@@ -107,10 +107,13 @@ namespace Neo.PerformanceInside.Test
         {
             //given
             string[] inputs = DataGenerator.GenerateArray(() => Path.GetRandomFileName(), 11);
-            //when           
-
+            //when    
+            PerformanceLite.OutPutFolder = "D:\\";                   
+            PerformanceLite pl = new PerformanceLite("test");
+            pl.CountMemory = true;
+            pl.BeginCount();
             ProcessInputs(inputs, 3);
-
+            pl.CountTime("test done");
             //then
             string performaceReport = PerformanceReport.GenerateReport();
             Assert.IsTrue(performaceReport.Split('\n').Length == 4 + 3);
